@@ -1,12 +1,17 @@
 import java.util.Arrays;
 
-public class Car extends Thread {
+// TODO: implement acquiring and releasing semaphores
+// TODO: implement case where semaphore requested is in use
+// TODO: allow for mutexes
+// TODO: correct wait timer location in CrossIntersection()
+
+public class Car {
     private int cid, arrival_time;
     private char dir_original, dir_target;
     private int waitTimer;
     private int status;
-    private String[] statuses = new String[]{"Ready", "Waiting"};
     private char[] directions = new char[]{'^', '>', 'V', '<'};
+    private int iteration;
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
         this.cid = cid;
@@ -16,9 +21,9 @@ public class Car extends Thread {
         this.status = -1;
     }
 
-    @Override
-    public void run() {
-        super.run();
+    public void run(int iteration) {
+
+        setIteration(iteration);
 
         switch(status){
             case 0: // ready
@@ -49,50 +54,107 @@ public class Car extends Thread {
     public void ArriveIntersection(){
         waitTimer = 2;
         status = 1;
-        System.out.println("Arriving");
+        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
     }
 
     public void CrossIntersection(){ // acquire semaphores on turns
-        int from = Arrays.asList(directions).indexOf(dir_original);
-        int to = Arrays.asList(directions).indexOf(dir_target);
+        int pre = Arrays.asList(directions).indexOf(dir_original);
+        int post = Arrays.asList(directions).indexOf(dir_target);
 
-        if(from == 3 && to == 0){
-            TurnRight();
-        } else if(from == 0 && to == 3) {
-            TurnLeft();
+        if(pre == 3 && post == 0){
+            TurnRight(pre);
+        } else if(pre == 0 && post == 3) {
+            TurnLeft(pre);
         } else {
-            int action = to - from;
+            int action = post - pre;
             if(action == 1)
-                TurnRight();
-            else if(Math.abs(action) == 2)
-                DriveThrough();
+                TurnRight(pre);
+            else if(Math.abs(action) == 0)
+                DriveThrough(pre);
             else if(action == -1)
-                TurnLeft();
+                TurnLeft(pre);
         }
 
         status = 3;
 
-        System.out.println("Crossing");
+        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
     }
 
     public void ExitIntersection(){
-        System.out.println("Exiting");
+        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")                   exiting");
+        status = 5;
     }
 
-    public void DriveThrough(){
+    public void DriveThrough(int pre){
+        switch (pre){
+            case 0:
+                Semaphores.get(4);
+                Semaphores.get(1);
+                break;
+            case 1:
+                Semaphores.get(3);
+                Semaphores.get(4);
+                break;
+            case 2:
+                Semaphores.get(2);
+                Semaphores.get(3);
+                break;
+            case 3:
+                Semaphores.get(1);
+                Semaphores.get(2);
+                break;
+            default:
+                break;
+        }
         waitTimer= 4;
     }
 
-    public void TurnLeft(){
+    public void TurnLeft(int pre){
+        switch(pre){
+            case 0:
+                Semaphores.get(4);
+                Semaphores.get(1);
+                Semaphores.get(2);
+                break;
+            case 1:
+                Semaphores.get(3);
+                Semaphores.get(4);
+                Semaphores.get(1);
+                break;
+            case 2:
+                Semaphores.get(2);
+                Semaphores.get(3);
+                Semaphores.get(4);
+                break;
+            case 3:
+                Semaphores.get(1);
+                Semaphores.get(2);
+                Semaphores.get(3);
+                break;
+            default:
+                break;
+        }
         waitTimer= 5;
     }
 
-    public void TurnRight(){
+    public void TurnRight(int pre){
+        switch(pre){
+            case 0:
+                Semaphores.get(4);
+                break;
+            case 1:
+                Semaphores.get(3);
+                break;
+            case 2:
+                Semaphores.get(2);
+                break;
+            case 3:
+                Semaphores.get(1);
+                break;
+            default:
+                break;
+        }
         waitTimer= 3;
-    }
-
-    public int getStatus(){
-        return status;
     }
 
     public void setStatus(int status){
@@ -105,5 +167,9 @@ public class Car extends Thread {
 
     public boolean isActive(){
         return !(status == 5 || status == -1);
+    }
+
+    private void setIteration(int i){
+        this.iteration = i;
     }
 }

@@ -1,7 +1,4 @@
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class main {
 
@@ -16,25 +13,17 @@ public class main {
                         new Car(5, 5, 'V', '>'),
                         new Car(6, 6, '^', '^'),
                         new Car(7, 7, '>', '^'),
-                        new Car(8, 8, '<', '^'));
-
-        List<Car> carsAtIntersection = new ArrayList<>();
-        ExecutorService pool = Executors.newFixedThreadPool(MAX_THREADS);
+                        new Car(8, 8, '<', '^')
+        );
 
         for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 99; i++){
-//            carList = carList.stream().filter(car -> car.isActive()).collect(Collectors.toList());
-            System.out.println("Iteration: " + i);
             activateCars(carList, i);
 
-            carList.forEach(car -> {
+            for (Car car : carList) {
                 if(car.isActive())
-                    pool.execute(car);
-            });
-
-//            pool.shutdown();
+                    car.run(i);
+            }
         }
-
-        //implement turns
     }
 
     public static boolean hasActiveCars(List<Car> carList){
