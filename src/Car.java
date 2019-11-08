@@ -13,7 +13,7 @@ public class Car extends Thread {
         this.arrival_time = arrival_time;
         this.dir_original = dir_original;
         this.dir_target = dir_target;
-        this.status = 0;
+        this.status = -1;
     }
 
     @Override
@@ -44,13 +44,6 @@ public class Car extends Thread {
             default:
                 break;
         }
-
-        try {
-            this.wait();
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
-
     }
 
     public void ArriveIntersection(){
@@ -100,5 +93,17 @@ public class Car extends Thread {
 
     public int getStatus(){
         return status;
+    }
+
+    public void setStatus(int status){
+        this.status = status;
+    }
+
+    public int getArrival_time(){
+        return arrival_time;
+    }
+
+    public boolean isActive(){
+        return !(status == 5 || status == -1);
     }
 }
