@@ -10,7 +10,7 @@ public class Car {
     private char dir_original, dir_target;
     private int waitTimer;
     private int status;
-    private char[] directions = new char[]{'^', '>', 'V', '<'};
+    private Character[] directions = new Character[]{'^', '>', 'V', '<'};
     private int iteration;
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
@@ -60,6 +60,7 @@ public class Car {
     public void CrossIntersection(){ // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
+//        System.out.println("Pre: " + pre + "; Post: " + post);
 
         if(pre == 3 && post == 0){
             TurnRight(pre);
@@ -69,7 +70,7 @@ public class Car {
             int action = post - pre;
             if(action == 1)
                 TurnRight(pre);
-            else if(Math.abs(action) == 0)
+            else if(action == 0)
                 DriveThrough(pre);
             else if(action == -1)
                 TurnLeft(pre);
@@ -86,50 +87,50 @@ public class Car {
     }
 
     public void DriveThrough(int pre){
-        switch (pre){
+        switch (pre) {
             case 0:
-                Semaphores.get(4);
-                Semaphores.get(1);
+                Semaphore.get(3);
+                Semaphore.get(0);
                 break;
             case 1:
-                Semaphores.get(3);
-                Semaphores.get(4);
+                Semaphore.get(2);
+                Semaphore.get(3);
                 break;
             case 2:
-                Semaphores.get(2);
-                Semaphores.get(3);
+                Semaphore.get(1);
+                Semaphore.get(2);
                 break;
             case 3:
-                Semaphores.get(1);
-                Semaphores.get(2);
+                Semaphore.get(0);
+                Semaphore.get(1);
                 break;
             default:
                 break;
         }
-        waitTimer= 4;
+        waitTimer = 4;
     }
 
     public void TurnLeft(int pre){
         switch(pre){
             case 0:
-                Semaphores.get(4);
-                Semaphores.get(1);
-                Semaphores.get(2);
+                Semaphore.get(3);
+                Semaphore.get(0);
+                Semaphore.get(1);
                 break;
             case 1:
-                Semaphores.get(3);
-                Semaphores.get(4);
-                Semaphores.get(1);
+                Semaphore.get(2);
+                Semaphore.get(3);
+                Semaphore.get(0);
                 break;
             case 2:
-                Semaphores.get(2);
-                Semaphores.get(3);
-                Semaphores.get(4);
+                Semaphore.get(1);
+                Semaphore.get(2);
+                Semaphore.get(3);
                 break;
             case 3:
-                Semaphores.get(1);
-                Semaphores.get(2);
-                Semaphores.get(3);
+                Semaphore.get(0);
+                Semaphore.get(1);
+                Semaphore.get(2);
                 break;
             default:
                 break;
@@ -140,16 +141,16 @@ public class Car {
     public void TurnRight(int pre){
         switch(pre){
             case 0:
-                Semaphores.get(4);
+                Semaphore.get(3);
                 break;
             case 1:
-                Semaphores.get(3);
+                Semaphore.get(2);
                 break;
             case 2:
-                Semaphores.get(2);
+                Semaphore.get(1);
                 break;
             case 3:
-                Semaphores.get(1);
+                Semaphore.get(0);
                 break;
             default:
                 break;
