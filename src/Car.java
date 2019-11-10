@@ -89,7 +89,8 @@ public class Car {
     public void DriveThrough(int pre){
         switch (pre) {
             case 0:
-                Semaphore.get(3);
+                Semaphore.get(3).acquire(this);
+                System.out.println(Semaphore.get(3).isActive(this));
                 Semaphore.get(0);
                 break;
             case 1:

@@ -2,8 +2,6 @@ import java.util.List;
 
 public class main {
 
-    static final int MAX_THREADS = 8;
-
     public static void main(String args[]){
 
         List<Car> carList = List.of(new Car(1, 1, '^', '^'),

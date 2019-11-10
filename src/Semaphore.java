@@ -1,6 +1,9 @@
 import java.util.LinkedList;
 import java.util.Queue;
 
+// TODO: may run into issue where after release next car will acquire and go
+//       but cars that already checked will not go
+
 /*
 Semaphore traffic chart:
 
@@ -63,6 +66,10 @@ public class Semaphore {
         } else if(permits < 1){
             permits = 1;
         }
+    }
+
+    public static boolean isActive(Car car){
+        return car == activeThread;
     }
 
 }
