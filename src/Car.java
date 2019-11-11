@@ -1,8 +1,5 @@
 import java.util.Arrays;
 
-// TODO: implement acquiring and releasing semaphores
-// TODO: implement case where semaphore requested is in use
-// TODO: allow for mutexes
 // TODO: correct wait timer location in CrossIntersection()
 
 public class Car {
@@ -10,8 +7,9 @@ public class Car {
     private char dir_original, dir_target;
     private int waitTimer;
     private int status;
-    private Character[] directions = new Character[]{'^', '>', 'V', '<'};
+    private Character[] directions = {'^', '>', 'V', '<'};
     private int iteration;
+    private int[] semaphores = {-1, -1, -1};
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
         this.cid = cid;
@@ -25,21 +23,23 @@ public class Car {
 
         setIteration(iteration);
 
-        switch(status){
+        switch (status) {
             case 0: // ready
                 ArriveIntersection();
                 break;
             case 1: // waiting to cross
                 waitTimer--;
-                if(waitTimer == 0){
+                if (waitTimer == 0) {
                     status = 2;
-                } else { break; }
+                } else {
+                    break;
+                }
             case 2: // attempting to cross
                 CrossIntersection();
                 break;
             case 3: // crossing
                 waitTimer--;
-                if(waitTimer != 0){
+                if (waitTimer != 0) {
                     break;
                 }
             case 4: // exiting
@@ -51,127 +51,167 @@ public class Car {
         }
     }
 
-    public void ArriveIntersection(){
+    public void ArriveIntersection() {
         waitTimer = 2;
         status = 1;
         System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
     }
 
-    public void CrossIntersection(){ // acquire semaphores on turns
+    public void CrossIntersection() { // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
 //        System.out.println("Pre: " + pre + "; Post: " + post);
 
-        if(pre == 3 && post == 0){
+        if (pre == 3 && post == 0) {
             TurnRight(pre);
-        } else if(pre == 0 && post == 3) {
+        } else if (pre == 0 && post == 3) {
             TurnLeft(pre);
         } else {
             int action = post - pre;
-            if(action == 1)
+            if (action == 1)
                 TurnRight(pre);
-            else if(action == 0)
+            else if (action == 0)
                 DriveThrough(pre);
-            else if(action == -1)
+            else if (action == -1)
                 TurnLeft(pre);
         }
 
-        status = 3;
-
-        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
+        if (waitTimer > 0) {
+            status = 3;
+            System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
+        }
     }
 
-    public void ExitIntersection(){
+    public void ExitIntersection() {
+
+        for(int i = 0; i < semaphores.length; i++){
+            if(semaphores[i] != -1) {
+                Semaphore.get(semaphores[i]).release();
+                semaphores[i] = -1;
+            }
+        }
+
         System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")                   exiting");
+
         status = 5;
     }
 
-    public void DriveThrough(int pre){
+    public void DriveThrough(int pre) {
+
+        boolean isSemaphoreOpen;
+
         switch (pre) {
             case 0:
-                Semaphore.get(3).acquire(this);
-                System.out.println(Semaphore.get(3).isActive(this));
-                Semaphore.get(0);
+                semaphores[0] = 3;
+                semaphores[1] = 0;
                 break;
             case 1:
-                Semaphore.get(2);
-                Semaphore.get(3);
+                semaphores[0] = 2;
+                semaphores[1] = 3;
                 break;
             case 2:
-                Semaphore.get(1);
-                Semaphore.get(2);
+                semaphores[0] = 1;
+                semaphores[1] = 2;
                 break;
             case 3:
-                Semaphore.get(0);
-                Semaphore.get(1);
+                semaphores[0] = 0;
+                semaphores[1] = 1;
                 break;
             default:
                 break;
         }
-        waitTimer = 4;
+
+        Semaphore.get(semaphores[0]).acquire(this);
+        Semaphore.get(semaphores[1]).acquire(this);
+        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this) && Semaphore.get(semaphores[1]).isAvailable(this);
+
+        if (isSemaphoreOpen)
+            waitTimer = 4;
     }
 
-    public void TurnLeft(int pre){
-        switch(pre){
+    public void TurnLeft(int pre) {
+
+        boolean isSemaphoreOpen;
+
+        switch (pre) {
             case 0:
-                Semaphore.get(3);
-                Semaphore.get(0);
-                Semaphore.get(1);
+                semaphores[0] = 3;
+                semaphores[1] = 0;
+                semaphores[2] = 1;
                 break;
             case 1:
-                Semaphore.get(2);
-                Semaphore.get(3);
-                Semaphore.get(0);
+                semaphores[0] = 2;
+                semaphores[1] = 3;
+                semaphores[2] = 0;
                 break;
             case 2:
-                Semaphore.get(1);
-                Semaphore.get(2);
-                Semaphore.get(3);
+                semaphores[0] = 1;
+                semaphores[1] = 2;
+                semaphores[2] = 3;
                 break;
             case 3:
-                Semaphore.get(0);
-                Semaphore.get(1);
-                Semaphore.get(2);
+                semaphores[0] = 0;
+                semaphores[1] = 1;
+                semaphores[2] = 2;
                 break;
             default:
                 break;
         }
-        waitTimer= 5;
+
+        Semaphore.get(semaphores[0]).acquire(this);
+        Semaphore.get(semaphores[1]).acquire(this);
+        Semaphore.get(semaphores[2]).acquire(this);
+        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this)
+                && Semaphore.get(semaphores[1]).isAvailable(this)
+                && Semaphore.get(semaphores[2]).isAvailable(this);
+
+        if(isSemaphoreOpen)
+            waitTimer = 5;
     }
 
-    public void TurnRight(int pre){
-        switch(pre){
+    public void TurnRight(int pre) {
+
+        boolean isSemaphoreOpen;
+
+        switch (pre) {
             case 0:
-                Semaphore.get(3);
+                semaphores[0] = 3;
                 break;
             case 1:
-                Semaphore.get(2);
+                semaphores[0] = 2;
                 break;
             case 2:
-                Semaphore.get(1);
+                semaphores[0] = 1;
                 break;
             case 3:
-                Semaphore.get(0);
+                semaphores[0] = 0;
                 break;
             default:
                 break;
         }
-        waitTimer= 3;
+
+        Semaphore.get(semaphores[0]).acquire(this);
+        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this);
+
+        if(isSemaphoreOpen)
+            waitTimer = 3;
     }
 
-    public void setStatus(int status){
+    public void setStatus(int status) {
         this.status = status;
     }
 
-    public int getArrival_time(){
+    public int getArrival_time() {
         return arrival_time;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return !(status == 5 || status == -1);
     }
 
-    private void setIteration(int i){
+    public int getCid(){ return cid; }
+
+    private void setIteration(int i) {
         this.iteration = i;
     }
 }

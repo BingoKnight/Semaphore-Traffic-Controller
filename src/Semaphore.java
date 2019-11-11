@@ -51,25 +51,28 @@ public class Semaphore {
         }
     }
 
-    public static void acquire(Car car){
+    public void acquire(Car car){
         if(permits == 1){
             permits--;
             activeThread = car;
         } else if(!accessQueue.contains(car)) {
-            accessQueue.add(car);
+            accessQueue.add(car); //TODO: check that queue doesn't double queue
         }
     }
 
-    public static void release(Car car){
+    public void release(){
         if(permits < 1 && accessQueue.size() > 0){
             activeThread = accessQueue.poll();
         } else if(permits < 1){
             permits = 1;
+            activeThread = null;
         }
     }
 
-    public static boolean isActive(Car car){
-        return car == activeThread;
+    public Car getActiveThread(){ return activeThread; }
+
+    public boolean isAvailable(Car car){
+        return permits == 1 || car == activeThread;
     }
 
 }

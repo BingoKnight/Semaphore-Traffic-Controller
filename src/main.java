@@ -1,5 +1,9 @@
 import java.util.List;
 
+// TODO: cars running out of order
+// TODO: cars utilizing all semaphores when crossing
+// TODO: implement mutexes
+
 public class main {
 
     public static void main(String args[]){
@@ -22,6 +26,11 @@ public class main {
                     car.run(i);
             }
         }
+
+        System.out.println("Car " + Semaphore.get(0).getActiveThread().getCid() + " has sem 0");
+        System.out.println("Car " + Semaphore.get(1).getActiveThread().getCid() + " has sem 1");
+        System.out.println("Car " + Semaphore.get(2).getActiveThread().getCid() + " has sem 2");
+        System.out.println("Car " + Semaphore.get(3).getActiveThread().getCid() + " has sem 3");
     }
 
     public static boolean hasActiveCars(List<Car> carList){
