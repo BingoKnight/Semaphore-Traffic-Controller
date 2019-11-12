@@ -36,7 +36,7 @@ public class Semaphore {
         this.semaphoreId = id;
     }
 
-    public void acquire(Car car){
+    public void acquire(Car car){ // TODO: acquire needs check queue because release does not
         if(permits == 1){
             this.permits--;
             this.activeThread = car;
@@ -46,9 +46,7 @@ public class Semaphore {
     }
 
     public void release(){
-        if(permits < 1 && accessQueue.size() > 0){
-            this.activeThread = this.accessQueue.poll();
-        } else if(permits < 1){
+        if(permits < 1){
             this.permits = 1;
             this.activeThread = null;
         }
@@ -59,5 +57,7 @@ public class Semaphore {
     public boolean isAvailable(Car car){ // permits == 1 will never get hit
         return this.permits == 1 || car == this.activeThread;
     }
+
+    public Queue<Car> getAccessQueue() { return accessQueue; }
 
 }
