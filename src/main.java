@@ -18,19 +18,25 @@ public class main {
                         new Car(8, 8, '<', '^')
         );
 
-        for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 99; i++){
+        List<Semaphore> semaphores = List.of( new Semaphore(0),
+                new Semaphore(1),
+                new Semaphore(2),
+                new Semaphore(3)
+        );
+
+        for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 999; i++){
             activateCars(carList, i);
 
             for (Car car : carList) {
                 if(car.isActive())
-                    car.run(i);
+                    car.run(i, semaphores);
             }
         }
 
-        System.out.println("Car " + Semaphore.get(0).getActiveThread().getCid() + " has sem 0");
-        System.out.println("Car " + Semaphore.get(1).getActiveThread().getCid() + " has sem 1");
-        System.out.println("Car " + Semaphore.get(2).getActiveThread().getCid() + " has sem 2");
-        System.out.println("Car " + Semaphore.get(3).getActiveThread().getCid() + " has sem 3");
+        System.out.println("Car " + semaphores.get(0).getActiveThread().getCid() + " has sem 0");
+        System.out.println("Car " + semaphores.get(1).getActiveThread().getCid() + " has sem 1");
+        System.out.println("Car " + semaphores.get(2).getActiveThread().getCid() + " has sem 2");
+        System.out.println("Car " + semaphores.get(3).getActiveThread().getCid() + " has sem 3");
     }
 
     public static boolean hasActiveCars(List<Car> carList){

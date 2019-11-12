@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5667dc57-310d-4358-a28b-a772f72ca35d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Car.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Semaphore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Semaphore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.java" afterDir="false" />
@@ -32,6 +31,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -70,7 +70,8 @@
       <option name="presentableId" value="Default" />
       <updated>1573099027313</updated>
       <workItem from="1573099031067" duration="10875000" />
-      <workItem from="1573429235000" duration="4979000" />
+      <workItem from="1573429235000" duration="5599000" />
+      <workItem from="1573526407306" duration="6002000" />
     </task>
     <servers />
   </component>
@@ -95,18 +96,23 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Car.java</url>
-          <line>23</line>
-          <option name="timeStamp" value="11" />
+          <line>126</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/Semaphore.java</url>
-          <line>73</line>
+          <line>58</line>
           <properties class="Semaphore" method="isAvailable">
             <option name="EMULATED" value="true" />
           </properties>
-          <option name="timeStamp" value="12" />
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="car.iteration" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

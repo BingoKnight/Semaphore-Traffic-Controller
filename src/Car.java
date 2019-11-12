@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.List;
 
 // TODO: correct wait timer location in CrossIntersection()
 
@@ -19,7 +20,7 @@ public class Car {
         this.status = -1;
     }
 
-    public void run(int iteration) {
+    public void run(int iteration, List<Semaphore> quadrants) {
 
         setIteration(iteration);
 
@@ -35,7 +36,7 @@ public class Car {
                     break;
                 }
             case 2: // attempting to cross
-                CrossIntersection();
+                CrossIntersection(quadrants);
                 break;
             case 3: // crossing
                 waitTimer--;
@@ -44,7 +45,7 @@ public class Car {
                 }
             case 4: // exiting
                 status = 4;
-                ExitIntersection();
+                ExitIntersection(quadrants);
                 break;
             default:
                 break;
@@ -57,23 +58,23 @@ public class Car {
         System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
     }
 
-    public void CrossIntersection() { // acquire semaphores on turns
+    public void CrossIntersection(List<Semaphore> quandrants) { // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
 //        System.out.println("Pre: " + pre + "; Post: " + post);
 
         if (pre == 3 && post == 0) {
-            TurnRight(pre);
+            TurnRight(pre, quandrants);
         } else if (pre == 0 && post == 3) {
-            TurnLeft(pre);
+            TurnLeft(pre, quandrants);
         } else {
             int action = post - pre;
             if (action == 1)
-                TurnRight(pre);
+                TurnRight(pre, quandrants);
             else if (action == 0)
-                DriveThrough(pre);
+                DriveThrough(pre, quandrants);
             else if (action == -1)
-                TurnLeft(pre);
+                TurnLeft(pre, quandrants);
         }
 
         if (waitTimer > 0) {
@@ -82,11 +83,11 @@ public class Car {
         }
     }
 
-    public void ExitIntersection() {
+    public void ExitIntersection(List<Semaphore> quadrants) {
 
         for(int i = 0; i < semaphores.length; i++){
             if(semaphores[i] != -1) {
-                Semaphore.get(semaphores[i]).release();
+                quadrants.get(semaphores[i]).release();
                 semaphores[i] = -1;
             }
         }
@@ -96,7 +97,7 @@ public class Car {
         status = 5;
     }
 
-    public void DriveThrough(int pre) {
+    public void DriveThrough(int pre, List<Semaphore> quandrants) {
 
         boolean isSemaphoreOpen;
 
@@ -121,15 +122,15 @@ public class Car {
                 break;
         }
 
-        Semaphore.get(semaphores[0]).acquire(this);
-        Semaphore.get(semaphores[1]).acquire(this);
-        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this) && Semaphore.get(semaphores[1]).isAvailable(this);
+        quandrants.get(semaphores[0]).acquire(this);
+        quandrants.get(semaphores[1]).acquire(this);
+        isSemaphoreOpen = quandrants.get(semaphores[0]).isAvailable(this) && quandrants.get(semaphores[1]).isAvailable(this);
 
         if (isSemaphoreOpen)
             waitTimer = 4;
     }
 
-    public void TurnLeft(int pre) {
+    public void TurnLeft(int pre, List<Semaphore> quandrants) {
 
         boolean isSemaphoreOpen;
 
@@ -158,18 +159,18 @@ public class Car {
                 break;
         }
 
-        Semaphore.get(semaphores[0]).acquire(this);
-        Semaphore.get(semaphores[1]).acquire(this);
-        Semaphore.get(semaphores[2]).acquire(this);
-        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this)
-                && Semaphore.get(semaphores[1]).isAvailable(this)
-                && Semaphore.get(semaphores[2]).isAvailable(this);
+        quandrants.get(semaphores[0]).acquire(this);
+        quandrants.get(semaphores[1]).acquire(this);
+        quandrants.get(semaphores[2]).acquire(this);
+        isSemaphoreOpen = quandrants.get(semaphores[0]).isAvailable(this)
+                && quandrants.get(semaphores[1]).isAvailable(this)
+                && quandrants.get(semaphores[2]).isAvailable(this);
 
         if(isSemaphoreOpen)
             waitTimer = 5;
     }
 
-    public void TurnRight(int pre) {
+    public void TurnRight(int pre, List<Semaphore> quandrants) {
 
         boolean isSemaphoreOpen;
 
@@ -190,8 +191,8 @@ public class Car {
                 break;
         }
 
-        Semaphore.get(semaphores[0]).acquire(this);
-        isSemaphoreOpen = Semaphore.get(semaphores[0]).isAvailable(this);
+        quandrants.get(semaphores[0]).acquire(this);
+        isSemaphoreOpen = quandrants.get(semaphores[0]).isAvailable(this);
 
         if(isSemaphoreOpen)
             waitTimer = 3;

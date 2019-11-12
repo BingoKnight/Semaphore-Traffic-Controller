@@ -8,11 +8,11 @@ import java.util.Queue;
 Semaphore traffic chart:
 
              |
-       2     |     1
+       1     |     0
              |
   -----------+-----------
              |
-       3     |     4
+       2     |     3
              |
 
 
@@ -27,52 +27,37 @@ Examples of quandrants used:
 */
 public class Semaphore {
 
-    private static int permits = 1;
-    private static Queue<Car> accessQueue = new LinkedList<>();
-    private static Car activeThread;
+    private int semaphoreId;
+    private int permits = 1;
+    private Queue<Car> accessQueue = new LinkedList<>();
+    private Car activeThread;
 
-    private static Semaphore[] sem = new Semaphore[4];
-
-    private Semaphore(){}
-
-    public static Semaphore get(int index){
-        try {
-//            System.out.println(index);
-            if(index >= sem.length)
-                throw new ArrayIndexOutOfBoundsException();
-
-            if(sem[index] == null)
-                sem[index] = new Semaphore();
-            return sem[index];
-
-        } catch(ArrayIndexOutOfBoundsException e){
-            e.printStackTrace();
-            return null;
-        }
+    public Semaphore(int id){
+        this.semaphoreId = id;
     }
 
     public void acquire(Car car){
         if(permits == 1){
-            permits--;
-            activeThread = car;
+            this.permits--;
+            this.activeThread = car;
         } else if(!accessQueue.contains(car)) {
-            accessQueue.add(car); //TODO: check that queue doesn't double queue
+            this.accessQueue.add(car); //TODO: check that queue doesn't double queue
         }
     }
 
     public void release(){
         if(permits < 1 && accessQueue.size() > 0){
-            activeThread = accessQueue.poll();
+            this.activeThread = this.accessQueue.poll();
         } else if(permits < 1){
-            permits = 1;
-            activeThread = null;
+            this.permits = 1;
+            this.activeThread = null;
         }
     }
 
-    public Car getActiveThread(){ return activeThread; }
+    public Car getActiveThread(){ return this.activeThread; }
 
-    public boolean isAvailable(Car car){
-        return permits == 1 || car == activeThread;
+    public boolean isAvailable(Car car){ // permits == 1 will never get hit
+        return this.permits == 1 || car == this.activeThread;
     }
 
 }
