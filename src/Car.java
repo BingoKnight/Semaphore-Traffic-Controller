@@ -126,8 +126,14 @@ public class Car {
         quandrants.get(semaphores[1]).acquire(this);
         isSemaphoreOpen = quandrants.get(semaphores[0]).isAvailable(this) && quandrants.get(semaphores[1]).isAvailable(this);
 
-        if (isSemaphoreOpen)
+        if (isSemaphoreOpen) {
             waitTimer = 4;
+        } else {
+            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid())
+                quandrants.get(semaphores[0]).release();
+            if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid())
+                quandrants.get(semaphores[1]).release();
+        }
     }
 
     public void TurnLeft(int pre, List<Semaphore> quandrants) {
@@ -166,8 +172,16 @@ public class Car {
                 && quandrants.get(semaphores[1]).isAvailable(this)
                 && quandrants.get(semaphores[2]).isAvailable(this);
 
-        if(isSemaphoreOpen)
+        if (isSemaphoreOpen){
             waitTimer = 5;
+        } else {
+            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid())
+                quandrants.get(semaphores[0]).release();
+            if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid())
+                quandrants.get(semaphores[1]).release();
+            if(this.getCid() == quandrants.get(semaphores[2]).getActiveThread().getCid())
+                quandrants.get(semaphores[2]).release();
+        }
     }
 
     public void TurnRight(int pre, List<Semaphore> quandrants) {

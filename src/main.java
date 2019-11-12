@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 // TODO: cars running out of order
 // TODO: cars utilizing all semaphores when crossing
@@ -9,20 +11,30 @@ public class main {
     public static void main(String args[]){
 
         List<Car> carList = List.of(new Car(1, 1, '^', '^'),
-                        new Car(2, 2, '^', '^'),
-                        new Car(3, 3, '^', '<'),
-                        new Car(4, 4, 'V', 'V'),
-                        new Car(5, 5, 'V', '>'),
-                        new Car(6, 6, '^', '^'),
-                        new Car(7, 7, '>', '^'),
-                        new Car(8, 8, '<', '^')
-        );
+                                    new Car(2, 2, '^', '^'),
+                                    new Car(3, 3, '^', '<'),
+                                    new Car(4, 4, 'V', 'V'),
+                                    new Car(5, 5, 'V', '>'),
+                                    new Car(6, 6, '^', '^'),
+                                    new Car(7, 7, '>', '^'),
+                                    new Car(8, 8, '<', '^')
+                         );
 
         List<Semaphore> semaphores = List.of( new Semaphore(0),
                 new Semaphore(1),
                 new Semaphore(2),
                 new Semaphore(3)
         );
+
+        /* Direction Queue
+            North side queue = 0
+            East side queue = 1
+            South side queue = 2
+            West side queue  = 3
+         */
+
+        ArrayList<Queue<Car>> directionQueue = new ArrayList<>();
+
 
         for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 999; i++){
             activateCars(carList, i);
