@@ -28,6 +28,8 @@ public class main {
                 new Semaphore(3)
         );
 
+        Queue<Car> intersectionQueue = new LinkedList<>();
+
         /* Direction Queue
             North side queue = 0
             East side queue = 1
@@ -43,24 +45,16 @@ public class main {
 
             for (Car car : carList) {
                 if(car.isActive())
-                    car.run(i, semaphores);
+                    car.run(i, semaphores,intersectionQueue);
             }
 
 //            System.out.println("hasActiveCars: " + hasActiveCars(carList));
 //            System.out.println();
-
+//
 //            System.out.println("Car " + ((semaphores.get(0).getActiveThread() != null) ? semaphores.get(0).getActiveThread().getCid() : "null") + " has sem 0");
-//            semaphores.get(0).getAccessQueue().stream().forEach(car -> System.out.print("Car: " + car.getCid() + ", "));
-//            System.out.println();
 //            System.out.println("Car " + ((semaphores.get(1).getActiveThread() != null) ? semaphores.get(1).getActiveThread().getCid() : "null") + " has sem 1");
-//            semaphores.get(1).getAccessQueue().stream().forEach(car -> System.out.print("Car: " + car.getCid() + ", "));
-//            System.out.println();
 //            System.out.println("Car " + ((semaphores.get(2).getActiveThread() != null) ? semaphores.get(2).getActiveThread().getCid() : "null") + " has sem 2");
-//            semaphores.get(2).getAccessQueue().stream().forEach(car -> System.out.print("Car: " + car.getCid() + ", "));
-//            System.out.println();
 //            System.out.println("Car " + ((semaphores.get(3).getActiveThread() != null) ? semaphores.get(3).getActiveThread().getCid() : "null") + " has sem 3");
-//            semaphores.get(3).getAccessQueue().stream().forEach(car -> System.out.print("Car: " + car.getCid() + ", "));
-//            System.out.println();
         }
 
     }

@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 
 // TODO: correct wait timer location in CrossIntersection()
 
@@ -20,7 +21,7 @@ public class Car {
         this.status = -1;
     }
 
-    public void run(int iteration, List<Semaphore> quadrants) {
+    public void run(int iteration, List<Semaphore> quadrants, Queue<Car> intersectionQueue) {
 
         setIteration(iteration);
 
@@ -87,7 +88,7 @@ public class Car {
 
         for(int i = 0; i < semaphores.length; i++){
             if(semaphores[i] != -1) {
-                quadrants.get(semaphores[i]).release();
+                quadrants.get(semaphores[i]).release(this);
                 semaphores[i] = -1;
             }
         }
@@ -129,10 +130,13 @@ public class Car {
         if (isSemaphoreOpen) {
             waitTimer = 4;
         } else {
-            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid())
-                quandrants.get(semaphores[0]).release();
-            if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid())
-                quandrants.get(semaphores[1]).release();
+            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid()) {
+                quandrants.get(semaphores[0]).release(this);
+                semaphores[0] = -1;
+            }if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid()) {
+                quandrants.get(semaphores[1]).release(this);
+                semaphores[1] = -1;
+            }
         }
     }
 
@@ -175,12 +179,16 @@ public class Car {
         if (isSemaphoreOpen){
             waitTimer = 5;
         } else {
-            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid())
-                quandrants.get(semaphores[0]).release();
-            if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid())
-                quandrants.get(semaphores[1]).release();
-            if(this.getCid() == quandrants.get(semaphores[2]).getActiveThread().getCid())
-                quandrants.get(semaphores[2]).release();
+            if(this.getCid() == quandrants.get(semaphores[0]).getActiveThread().getCid()) {
+                quandrants.get(semaphores[0]).release(this);
+                semaphores[0] = -1;
+            }if(this.getCid() == quandrants.get(semaphores[1]).getActiveThread().getCid()) {
+                quandrants.get(semaphores[1]).release(this);
+                semaphores[1] = -1;
+            }if(this.getCid() == quandrants.get(semaphores[2]).getActiveThread().getCid()) {
+                quandrants.get(semaphores[2]).release(this);
+                semaphores[2] = -1;
+            }
         }
     }
 

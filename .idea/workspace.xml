@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5667dc57-310d-4358-a28b-a772f72ca35d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Car.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Semaphore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Semaphore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.java" afterDir="false" />
@@ -73,6 +72,7 @@
       <workItem from="1573099031067" duration="10875000" />
       <workItem from="1573429235000" duration="5599000" />
       <workItem from="1573526407306" duration="10405000" />
+      <workItem from="1573615182192" duration="4232000" />
     </task>
     <servers />
   </component>
@@ -93,6 +93,20 @@
     </option>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main.java</url>
+          <line>43</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main.java</url>
+          <line>51</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="car.iteration" />

@@ -48,8 +48,8 @@ public class Semaphore {
 //        }
     }
 
-    public void release(){
-        if(permits < 1){
+    public void release(Car car){
+        if(permits < 1 && (activeThread == null || activeThread.getCid() == car.getCid())){
             this.permits = 1;
             this.activeThread = null;
         }
