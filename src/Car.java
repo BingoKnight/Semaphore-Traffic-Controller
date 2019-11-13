@@ -226,6 +226,14 @@ public class Car {
 
     public int getCid(){ return cid; }
 
+    public char getDir_original(){
+        return this.dir_original;
+    }
+
+    public int getWaitTimer(){
+        return this.waitTimer;
+    }
+
     private void setIteration(int i) {
         this.iteration = i;
     }
