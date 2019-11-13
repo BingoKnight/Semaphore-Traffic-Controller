@@ -36,20 +36,28 @@ public class Semaphore {
         this.semaphoreId = id;
     }
 
-    public void acquire(Car car){ // TODO: acquire needs check queue because release does not
-        if(permits == 1){
+    public void acquire(Car car, Queue<Car> intersectionQueue){ // TODO: acquire needs check queue because release does not
+        if(this.permits == 1 && car.isEqual(intersectionQueue.peek())){
             this.permits--;
             this.activeThread = car;
-        } else if(car.getDir_original() == activeThread.getDir_original() && car.getWaitTimer() > activeThread.getWaitTimer()){
+//            System.out.println(car.getCid());
+//            System.out.println(permits);
+        } else if(activeThread != null &&
+                car.getDir_original() == activeThread.getDir_original() &&
+                car.getWaitTimer() > activeThread.getWaitTimer() &&
+                car.isEqual(intersectionQueue.peek())){
+//            System.out.println(car.getDir_original() == activeThread.getDir_original());
+//            System.out.println(car.getWaitTimer() > activeThread.getWaitTimer());
+//            System.out.println(car.isEqual(intersectionQueue.peek()));
             activeThread = car;
+        } else {
+//            System.out.println("car.getWaitTimer() = " + car.getWaitTimer() + "; activeThread.getWaitTimer() = " + activeThread.getWaitTimer());
         }
-//        else if(!accessQueue.contains(car)) {
-//            this.accessQueue.add(car); //TODO: check that queue doesn't double queue
-//        }
     }
 
     public void release(Car car){
-        if(permits < 1 && (activeThread == null || activeThread.getCid() == car.getCid())){
+        if(this.permits < 1 && (activeThread == null || activeThread.getCid() == car.getCid())){
+//            System.out.println("Car " + car.getCid() + " is now released sem " + semaphoreId);
             this.permits = 1;
             this.activeThread = null;
         }
