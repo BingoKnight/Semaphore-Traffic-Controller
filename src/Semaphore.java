@@ -1,5 +1,4 @@
-import java.util.Queue;
-
+import java.util.List;
 /*
 Semaphore traffic chart:
 
@@ -31,11 +30,11 @@ public class Semaphore {
         this.semaphoreId = id;
     }
 
-    public void acquire(Car car, Queue<Car> intersectionQueue){
-        if(this.permits == 1 && car.isEqual(intersectionQueue.peek())){
+    public void acquire(Car car, List<Car> intersectionQueue){
+        if(this.permits == 1 && car.isEqual(intersectionQueue.get(0))){
             this.permits--;
             this.activeThread = car;
-        } else if(this.permits == 1 && intersectionQueue.peek() != null && Car.isBlocked(intersectionQueue.peek())){
+        } else if(this.permits == 1 && intersectionQueue.get(0) != null ){
             for(Car temp : intersectionQueue){
                 if(car.isEqual(temp)){
                     this.permits--;
@@ -46,7 +45,7 @@ public class Semaphore {
         } else if(activeThread != null &&
                 car.getDir_original() == activeThread.getDir_original() &&
                 car.getWaitTimer() > activeThread.getWaitTimer() &&
-                car.isEqual(intersectionQueue.peek())){
+                car.isEqual(intersectionQueue.get(0))){
             activeThread = car;
         }
     }
@@ -60,26 +59,11 @@ public class Semaphore {
 
     public Car getActiveThread(){ return this.activeThread; }
 
-    public boolean isAvailable(Car car, Queue<Car> intersectionQueue){
-        return !Car.isBlocked(car) &&
-                ((this.permits == 1 && areCarsAheadBlocked(car, intersectionQueue)) || // running car 7 because its not blocked regardless of if cars ahead are blocked
+    public boolean isAvailable(Car car, List<Car> intersectionQueue){
+        return  (this.permits == 1  || //  running car 7 because its not blocked regardless of if cars ahead are blocked
                     car == this.activeThread ||
                     (activeThread != null &&
                         car.getDir_original() == activeThread.getDir_original() &&
-                        car.isEqual(intersectionQueue.peek())));
-    }
-
-    private boolean areCarsAheadBlocked(Car car, Queue<Car> intersectionQueue){
-        boolean carsAheadBlocked = true;
-        for(Car temp : intersectionQueue){
-            if(temp.getCid() == car.getCid())
-                break;
-            if(!Car.isBlocked(temp)) {
-                carsAheadBlocked = false;
-                break;
-            }
-        }
-
-        return carsAheadBlocked;
+                        car.isEqual(intersectionQueue.get(0))));
     }
 }

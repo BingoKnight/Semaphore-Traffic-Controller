@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Queue;
 
 public class Car {
-    public static boolean isNorthBlocked = false,
-                          isSouthBlocked = false,
-                          isWestBlocked = false,
-                          isEastBlocked = false;
+
+    public static LinkedList<Car> retryQueue = new LinkedList<>();
 
     private int cid, arrival_time;
     private char dir_original, dir_target;
@@ -16,6 +14,7 @@ public class Car {
     private Character[] directions = {'^', '>', 'V', '<'};
     private int iteration;
     private int[] semaphores = {-1, -1, -1};
+    private int priority = 0;
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
         this.cid = cid;
@@ -25,9 +24,11 @@ public class Car {
         this.status = -1;
     }
 
-    public void run(int iteration, List<Semaphore> quadrants, Queue<Car> intersectionQueue) {
+    public void run(int iteration, List<Semaphore> quadrants, List<Car> intersectionQueue) {
 
         setIteration(iteration);
+
+        priority = DirectionalQueues.getPriority(this);
 
         switch (status) {
             case 0: // ready
@@ -41,8 +42,7 @@ public class Car {
                     break;
                 }
             case 2: // attempting to cross
-                if(!isBlocked(this))
-                    CrossIntersection(quadrants, intersectionQueue);
+                CrossIntersection(quadrants, intersectionQueue); // TODO:  implement retry queue
                 break;
             case 3: // crossing
                 waitTimer--;
@@ -58,14 +58,17 @@ public class Car {
         }
     }
 
-    public void ArriveIntersection(Queue<Car> intersectionQueue) {
+    public void ArriveIntersection(List<Car> intersectionQueue) {
         waitTimer = 2;
         status = 1;
+
+        DirectionalQueues.add(this);
+
         System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
         intersectionQueue.add(this);
     }
 
-    public void CrossIntersection(List<Semaphore> quadrants, Queue<Car> intersectionQueue) { // acquire semaphores on turns
+    public void CrossIntersection(List<Semaphore> quadrants, List<Car> intersectionQueue) { // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
 
@@ -89,10 +92,12 @@ public class Car {
             for(Car car : intersectionQueue){
                 if (this.isEqual(car)) {
                     intersectionQueue.remove(car);
+                    DirectionalQueues.remove(car);
                     break;
                 }
             }
-            setBlocked();
+        } else if(!retryQueue.contains(this)) {
+            retryQueue.add(this);
         }
     }
 
@@ -110,7 +115,7 @@ public class Car {
         status = 5;
     }
 
-public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersectionQueue) {
+public void DriveThrough(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
           waitTimer = 4;
@@ -152,7 +157,7 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
         }
     }
 
-    public void TurnLeft(int pre, List<Semaphore> quadrants, Queue<Car> intersectionQueue) {
+    public void TurnLeft(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
         waitTimer = 5;
@@ -204,7 +209,7 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
         }
     }
 
-    public void TurnRight(int pre, List<Semaphore> quadrants, Queue<Car> intersectionQueue) {
+    public void TurnRight(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
         waitTimer = 3;
@@ -271,31 +276,7 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
         return quadrants.get(index).getActiveThread() != null && this.getCid() == quadrants.get(index).getActiveThread().getCid();
     }
 
-    public static void ResetBlocked(){
-        isNorthBlocked = isSouthBlocked =  isEastBlocked = isWestBlocked = false;
-    }
-
-    private void setBlocked(){
-        if(dir_original == '^')
-            isNorthBlocked = true;
-        else if(dir_original == '>')
-            isEastBlocked = true;
-        else if(dir_original == '<')
-            isWestBlocked = true;
-        else if(dir_original == 'V')
-            isSouthBlocked = true;
-    }
-
-    public static boolean isBlocked(Car car){
-        if(car.getDir_original() == '^')
-            return isNorthBlocked;
-        else if(car.getDir_original() == '>')
-            return isEastBlocked;
-        else if(car.getDir_original() == '<')
-            return isWestBlocked;
-        else if(car.getDir_original() == 'V')
-            return isSouthBlocked;
-        else
-            return false;
+    public int getPriority(){
+        return this.priority;
     }
 }
