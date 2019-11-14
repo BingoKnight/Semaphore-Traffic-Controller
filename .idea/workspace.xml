@@ -3,7 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="5667dc57-310d-4358-a28b-a772f72ca35d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/Semaphore.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/Semaphore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Car.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/DirectionalQueues.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DirectionalQueues.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Semaphore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Semaphore.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -105,18 +110,19 @@
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Main.java</url>
           <line>31</line>
-          <option name="timeStamp" value="1" />
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>36</line>
-          <option name="timeStamp" value="6" />
+          <line>37</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="car.iteration" />
+        <watch expression="intersectionQueue.toArray()[4]" />
       </configuration>
     </watches-manager>
   </component>

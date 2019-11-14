@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /* TODO: proper priority not applied, 5 arrives behind 4 and sits behind 4 while 6, 7, and 8 arrive
 
@@ -23,9 +25,8 @@ public class Main {
                 new Semaphore(3)
         );
 
-        Queue<Car> intersectionQueue = new LinkedList<>();
-
-        carList.sort(Comparator.comparingInt(Car::getArrival_time));
+        List<Car> intersectionQueue = new LinkedList<>();
+        intersectionQueue.sort(Comparator.comparingInt(Car::getArrival_time));
 
         for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 999; i++){
             activateCars(carList, i);
@@ -35,8 +36,8 @@ public class Main {
                     car.run(i, semaphores, intersectionQueue);
             }
             Car.ResetBlocked();
+            intersectionQueue = (intersectionQueue.stream().sorted(Comparator.comparingInt(Car::getPriority))).collect(Collectors.toList());
         }
-
     }
 
     public static boolean hasActiveCars(List<Car> carList){
