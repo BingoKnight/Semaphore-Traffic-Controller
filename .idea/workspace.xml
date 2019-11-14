@@ -5,8 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/Car.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/Semaphore.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/Semaphore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/CIS450-P3/main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/CIS450-P3/main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Car.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Car.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DirectionalQueues.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DirectionalQueues.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Semaphore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Semaphore.java" afterDir="false" />
     </list>
@@ -105,20 +105,6 @@
     </option>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>31</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Main.java</url>
-          <line>37</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="car.iteration" />

@@ -35,8 +35,13 @@ public class Main {
                 if(car.isActive())
                     car.run(i, semaphores, intersectionQueue);
             }
-            Car.ResetBlocked();
+
+            for(Car car : Car.retryQueue){
+                if(car.isActive())
+                    car.run(i, semaphores, intersectionQueue);
+            }
             intersectionQueue = (intersectionQueue.stream().sorted(Comparator.comparingInt(Car::getPriority))).collect(Collectors.toList());
+            Car.retryQueue.clear();
         }
     }
 

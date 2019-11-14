@@ -34,7 +34,7 @@ public class Semaphore {
         if(this.permits == 1 && car.isEqual(intersectionQueue.get(0))){
             this.permits--;
             this.activeThread = car;
-        } else if(this.permits == 1 && intersectionQueue.get(0) != null && Car.isBlocked(intersectionQueue.get(0))){
+        } else if(this.permits == 1 && intersectionQueue.get(0) != null ){
             for(Car temp : intersectionQueue){
                 if(car.isEqual(temp)){
                     this.permits--;
@@ -60,25 +60,10 @@ public class Semaphore {
     public Car getActiveThread(){ return this.activeThread; }
 
     public boolean isAvailable(Car car, List<Car> intersectionQueue){
-        return !Car.isBlocked(car) &&
-                ((this.permits == 1 && areCarsAheadBlocked(car, intersectionQueue)) || // running car 7 because its not blocked regardless of if cars ahead are blocked
+        return  (this.permits == 1  || //  running car 7 because its not blocked regardless of if cars ahead are blocked
                     car == this.activeThread ||
                     (activeThread != null &&
                         car.getDir_original() == activeThread.getDir_original() &&
                         car.isEqual(intersectionQueue.get(0))));
-    }
-
-    private boolean areCarsAheadBlocked(Car car, List<Car> intersectionQueue){
-        boolean carsAheadBlocked = true;
-        for(Car temp : intersectionQueue){
-            if(temp.getCid() == car.getCid())
-                break;
-            if(!Car.isBlocked(temp)) {
-                carsAheadBlocked = false;
-                break;
-            }
-        }
-
-        return carsAheadBlocked;
     }
 }

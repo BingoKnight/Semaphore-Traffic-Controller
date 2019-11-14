@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.Queue;
 
 public class Car {
-    public static boolean isNorthBlocked = false,
-                          isSouthBlocked = false,
-                          isWestBlocked = false,
-                          isEastBlocked = false;
+
+    public static LinkedList<Car> retryQueue = new LinkedList<>();
 
     private int cid, arrival_time;
     private char dir_original, dir_target;
@@ -44,8 +42,7 @@ public class Car {
                     break;
                 }
             case 2: // attempting to cross
-                if(!isBlocked(this))
-                    CrossIntersection(quadrants, intersectionQueue);
+                CrossIntersection(quadrants, intersectionQueue); // TODO:  implement retry queue
                 break;
             case 3: // crossing
                 waitTimer--;
@@ -99,7 +96,8 @@ public class Car {
                     break;
                 }
             }
-            setBlocked();
+        } else if(!retryQueue.contains(this)) {
+            retryQueue.add(this);
         }
     }
 
@@ -276,34 +274,6 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, List<Car> intersect
 
     private boolean isSemaphoreOwned(int index, List<Semaphore> quadrants){
         return quadrants.get(index).getActiveThread() != null && this.getCid() == quadrants.get(index).getActiveThread().getCid();
-    }
-
-    public static void ResetBlocked(){
-        isNorthBlocked = isSouthBlocked =  isEastBlocked = isWestBlocked = false;
-    }
-
-    private void setBlocked(){
-        if(dir_original == '^')
-            isNorthBlocked = true;
-        else if(dir_original == '>')
-            isEastBlocked = true;
-        else if(dir_original == '<')
-            isWestBlocked = true;
-        else if(dir_original == 'V')
-            isSouthBlocked = true;
-    }
-
-    public static boolean isBlocked(Car car){
-        if(car.getDir_original() == '^')
-            return isNorthBlocked;
-        else if(car.getDir_original() == '>')
-            return isEastBlocked;
-        else if(car.getDir_original() == '<')
-            return isWestBlocked;
-        else if(car.getDir_original() == 'V')
-            return isSouthBlocked;
-        else
-            return false;
     }
 
     public int getPriority(){
