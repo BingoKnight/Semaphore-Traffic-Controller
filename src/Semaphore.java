@@ -1,8 +1,4 @@
-import java.util.LinkedList;
 import java.util.Queue;
-
-// TODO: may run into issue where after release next car will acquire and go
-//       but cars that already checked will not go
 
 /*
 Semaphore traffic chart:
@@ -29,35 +25,34 @@ public class Semaphore {
 
     private int semaphoreId;
     private int permits = 1;
-//    private Queue<Car> accessQueue = new LinkedList<>();
     private Car activeThread;
 
     public Semaphore(int id){
         this.semaphoreId = id;
     }
 
-    public void acquire(Car car, Queue<Car> intersectionQueue){ // TODO: acquire needs check queue because release does not
+    public void acquire(Car car, Queue<Car> intersectionQueue){
         if(this.permits == 1 && car.isEqual(intersectionQueue.peek())){
             this.permits--;
             this.activeThread = car;
-//            System.out.println(car.getCid());
-//            System.out.println(permits);
+        } else if(this.permits == 1 && intersectionQueue.peek() != null && Car.isBlocked(intersectionQueue.peek())){
+            for(Car temp : intersectionQueue){
+                if(car.isEqual(temp)){
+                    this.permits--;
+                    this.activeThread = car;
+                    break;
+                }
+            }
         } else if(activeThread != null &&
                 car.getDir_original() == activeThread.getDir_original() &&
                 car.getWaitTimer() > activeThread.getWaitTimer() &&
                 car.isEqual(intersectionQueue.peek())){
-//            System.out.println(car.getDir_original() == activeThread.getDir_original());
-//            System.out.println(car.getWaitTimer() > activeThread.getWaitTimer());
-//            System.out.println(car.isEqual(intersectionQueue.peek()));
             activeThread = car;
-        } else {
-//            System.out.println("car.getWaitTimer() = " + car.getWaitTimer() + "; activeThread.getWaitTimer() = " + activeThread.getWaitTimer());
         }
     }
 
     public void release(Car car){
         if(this.permits < 1 && (activeThread == null || activeThread.getCid() == car.getCid())){
-//            System.out.println("Car " + car.getCid() + " is now released sem " + semaphoreId);
             this.permits = 1;
             this.activeThread = null;
         }
@@ -65,10 +60,26 @@ public class Semaphore {
 
     public Car getActiveThread(){ return this.activeThread; }
 
-    public boolean isAvailable(Car car){ // permits == 1 will never get hit
-        return this.permits == 1 || car == this.activeThread || car.getDir_original() == activeThread.getDir_original();
+    public boolean isAvailable(Car car, Queue<Car> intersectionQueue){
+        return !Car.isBlocked(car) &&
+                ((this.permits == 1 && areCarsAheadBlocked(car, intersectionQueue)) || // running car 7 because its not blocked regardless of if cars ahead are blocked
+                    car == this.activeThread ||
+                    (activeThread != null &&
+                        car.getDir_original() == activeThread.getDir_original() &&
+                        car.isEqual(intersectionQueue.peek())));
     }
 
-//    public Queue<Car> getAccessQueue() { return accessQueue; }
+    private boolean areCarsAheadBlocked(Car car, Queue<Car> intersectionQueue){
+        boolean carsAheadBlocked = true;
+        for(Car temp : intersectionQueue){
+            if(temp.getCid() == car.getCid())
+                break;
+            if(!Car.isBlocked(temp)) {
+                carsAheadBlocked = false;
+                break;
+            }
+        }
 
+        return carsAheadBlocked;
+    }
 }

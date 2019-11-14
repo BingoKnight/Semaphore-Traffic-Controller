@@ -1,12 +1,9 @@
-import org.w3c.dom.ls.LSOutput;
-
 import java.util.*;
 
-// TODO: cars running out of order
-// TODO: cars utilizing all semaphores when crossing
-// TODO: implement mutexes
+/* TODO: proper priority not applied, 5 arrives behind 4 and sits behind 4 while 6, 7, and 8 arrive
 
-public class main {
+*/
+public class Main {
 
     public static void main(String args[]){
 
@@ -20,8 +17,6 @@ public class main {
                                     new Car(8, 8, '<', '^')
                             );
 
-        carList.sort(Comparator.comparingInt(Car::getArrival_time));
-
         List<Semaphore> semaphores = List.of( new Semaphore(0),
                 new Semaphore(1),
                 new Semaphore(2),
@@ -30,31 +25,16 @@ public class main {
 
         Queue<Car> intersectionQueue = new LinkedList<>();
 
-        /* Direction Queue
-            North side queue = 0
-            East side queue = 1
-            South side queue = 2
-            West side queue  = 3
-         */
-
-        ArrayList<Queue<Car>> directionQueue = new ArrayList<>();
-
+        carList.sort(Comparator.comparingInt(Car::getArrival_time));
 
         for(int i = 1; (hasActiveCars(carList) || i == 1) && i < 999; i++){
             activateCars(carList, i);
 
             for (Car car : carList) {
                 if(car.isActive())
-                    car.run(i, semaphores,intersectionQueue);
+                    car.run(i, semaphores, intersectionQueue);
             }
-
-//            System.out.println("hasActiveCars: " + hasActiveCars(carList));
-//            System.out.println();
-//
-//            System.out.println("Car " + ((semaphores.get(0).getActiveThread() != null) ? semaphores.get(0).getActiveThread().getCid() : "null") + " has sem 0");
-//            System.out.println("Car " + ((semaphores.get(1).getActiveThread() != null) ? semaphores.get(1).getActiveThread().getCid() : "null") + " has sem 1");
-//            System.out.println("Car " + ((semaphores.get(2).getActiveThread() != null) ? semaphores.get(2).getActiveThread().getCid() : "null") + " has sem 2");
-//            System.out.println("Car " + ((semaphores.get(3).getActiveThread() != null) ? semaphores.get(3).getActiveThread().getCid() : "null") + " has sem 3");
+            Car.ResetBlocked();
         }
 
     }

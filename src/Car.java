@@ -1,10 +1,14 @@
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-// TODO: correct wait timer location in CrossIntersection()
-
 public class Car {
+    public static boolean isNorthBlocked = false,
+                          isSouthBlocked = false,
+                          isWestBlocked = false,
+                          isEastBlocked = false;
+
     private int cid, arrival_time;
     private char dir_original, dir_target;
     private int waitTimer;
@@ -37,7 +41,8 @@ public class Car {
                     break;
                 }
             case 2: // attempting to cross
-                CrossIntersection(quadrants, intersectionQueue);
+                if(!isBlocked(this))
+                    CrossIntersection(quadrants, intersectionQueue);
                 break;
             case 3: // crossing
                 waitTimer--;
@@ -63,7 +68,6 @@ public class Car {
     public void CrossIntersection(List<Semaphore> quadrants, Queue<Car> intersectionQueue) { // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
-//        System.out.println("Pre: " + pre + "; Post: " + post);
 
         if (pre == 3 && post == 0) {
             TurnRight(pre, quadrants, intersectionQueue);
@@ -82,7 +86,13 @@ public class Car {
         if (waitTimer > 0) {
             status = 3;
             System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
-            intersectionQueue.poll();
+            for(Car car : intersectionQueue){
+                if (this.isEqual(car)) {
+                    intersectionQueue.remove(car);
+                    break;
+                }
+            }
+            setBlocked();
         }
     }
 
@@ -128,9 +138,7 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
 
         quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
         quadrants.get(semaphores[1]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this) && quadrants.get(semaphores[1]).isAvailable(this);
-//        System.out.println("quadrants.get(semaphores[0]).isAvailable(this); = " + quadrants.get(semaphores[0]).isAvailable(this));
-//        System.out.println("quadrants.get(semaphores[1]).isAvailable(this); = " + quadrants.get(semaphores[1]).isAvailable(this));
+        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue) && quadrants.get(semaphores[1]).isAvailable(this, intersectionQueue);
 
         if (!isSemaphoreOpen)  {
             waitTimer = 0;
@@ -177,12 +185,9 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
         quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
         quadrants.get(semaphores[1]).acquire(this, intersectionQueue);
         quadrants.get(semaphores[2]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this)
-                && quadrants.get(semaphores[1]).isAvailable(this)
-                && quadrants.get(semaphores[2]).isAvailable(this);
-//        System.out.println("quadrants.get(semaphores[0]).isAvailable(this); = " + quadrants.get(semaphores[0]).isAvailable(this));
-//        System.out.println("quadrants.get(semaphores[1]).isAvailable(this); = " + quadrants.get(semaphores[1]).isAvailable(this));
-//        System.out.println("quadrants.get(semaphores[2]).isAvailable(this); = " + quadrants.get(semaphores[2]).isAvailable(this));
+        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue)
+                && quadrants.get(semaphores[1]).isAvailable(this, intersectionQueue)
+                && quadrants.get(semaphores[2]).isAvailable(this, intersectionQueue);
 
         if (!isSemaphoreOpen) {
             waitTimer = 0;
@@ -222,8 +227,7 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
         }
 
         quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this);
-//        System.out.println("quadrants.get(semaphores[0]).isAvailable(this); = " + quadrants.get(semaphores[0]).isAvailable(this));
+        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue);
 
         if(!isSemaphoreOpen)
             waitTimer = 0;
@@ -265,5 +269,33 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, Queue<Car> intersec
 
     private boolean isSemaphoreOwned(int index, List<Semaphore> quadrants){
         return quadrants.get(index).getActiveThread() != null && this.getCid() == quadrants.get(index).getActiveThread().getCid();
+    }
+
+    public static void ResetBlocked(){
+        isNorthBlocked = isSouthBlocked =  isEastBlocked = isWestBlocked = false;
+    }
+
+    private void setBlocked(){
+        if(dir_original == '^')
+            isNorthBlocked = true;
+        else if(dir_original == '>')
+            isEastBlocked = true;
+        else if(dir_original == '<')
+            isWestBlocked = true;
+        else if(dir_original == 'V')
+            isSouthBlocked = true;
+    }
+
+    public static boolean isBlocked(Car car){
+        if(car.getDir_original() == '^')
+            return isNorthBlocked;
+        else if(car.getDir_original() == '>')
+            return isEastBlocked;
+        else if(car.getDir_original() == '<')
+            return isWestBlocked;
+        else if(car.getDir_original() == 'V')
+            return isSouthBlocked;
+        else
+            return false;
     }
 }
