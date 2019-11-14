@@ -1,5 +1,10 @@
 import java.util.LinkedList;
-import java.util.Queue;
+
+/*
+    The Directional Queue is the queue for each cardinal direction in respect to the intersection.
+    Car objects populate these queues based on the direction then came from and are removed from
+    the queue once they initiate crossing the intersection
+ */
 
 public class DirectionalQueues {
     public static LinkedList<Car> north = new LinkedList<>();
@@ -7,6 +12,7 @@ public class DirectionalQueues {
     public static LinkedList<Car> west = new LinkedList<>();
     public static LinkedList<Car> south = new LinkedList<>();
 
+    // adds car to appropriate queue based on its original direction
     public static void add(Car car){
         if(car.getDir_original() == '^')
             south.add(car);
@@ -18,6 +24,7 @@ public class DirectionalQueues {
             north.add(car);
     }
 
+    // sets the priority of a car object based on it's position in the queue
     public static int getPriority(Car car){
         if(car.getDir_original() == '^')
             for(int i = 0; i < south.size(); i++){
@@ -43,6 +50,7 @@ public class DirectionalQueues {
         return 0;
     }
 
+    // removes car object from appropriate queue
     public static void remove(Car car){
         if(car.getDir_original() == '^')
             south.remove(car);
