@@ -22,7 +22,13 @@ Examples of quandrants used:
 */
 public class Semaphore {
 
-    private int semaphoreId;
+    public static List<Semaphore> semaphores = List.of( new Semaphore(0),
+            new Semaphore(1),
+            new Semaphore(2),
+            new Semaphore(3)
+    );
+
+    private int semaphoreId; // used for debugging purposes
     private int permits = 1;
     private Car activeThread;
 
@@ -30,6 +36,8 @@ public class Semaphore {
         this.semaphoreId = id;
     }
 
+    // locks semaphore for car that requests it if it is available and acts like a mutex where it
+    // assigns it to the car that has the largest crossing time but also the next in line
     public void acquire(Car car, List<Car> intersectionQueue){
         if(this.permits == 1 && car.isEqual(intersectionQueue.get(0))){
             this.permits--;
@@ -50,6 +58,7 @@ public class Semaphore {
         }
     }
 
+    // unlocks the semaphore and for another car to use
     public void release(Car car){
         if(this.permits < 1 && (activeThread == null || activeThread.getCid() == car.getCid())){
             this.permits = 1;
@@ -60,7 +69,7 @@ public class Semaphore {
     public Car getActiveThread(){ return this.activeThread; }
 
     public boolean isAvailable(Car car, List<Car> intersectionQueue){
-        return  (this.permits == 1  || //  running car 7 because its not blocked regardless of if cars ahead are blocked
+        return  (this.permits == 1  ||
                     car == this.activeThread ||
                     (activeThread != null &&
                         car.getDir_original() == activeThread.getDir_original() &&

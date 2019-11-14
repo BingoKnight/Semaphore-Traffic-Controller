@@ -1,7 +1,16 @@
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+
+
+/*
+    This object references a car and its attempts to cross an intersection. Each car is considered
+    a thread to the intersection attempting to access semaphores based on their availability and the
+    cars priority.
+    A cars priority is determined by it's position in line from a given direction in respect to the intersection
+    and by it's arrival time.
+    Each car uses a wait timer which references the time it must wait before attempting its next action.
+ */
 
 public class Car {
 
@@ -13,7 +22,7 @@ public class Car {
     private int status;
     private Character[] directions = {'^', '>', 'V', '<'};
     private int iteration;
-    private int[] semaphores = {-1, -1, -1};
+    private int[] semaphoresUsed = {-1, -1, -1};
     private int priority = 0;
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
@@ -24,8 +33,10 @@ public class Car {
         this.status = -1;
     }
 
-    public void run(int iteration, List<Semaphore> quadrants, List<Car> intersectionQueue) {
+    // runs one turn of the car
+    public void run(int iteration, List<Car> intersectionQueue) {
 
+        // sets turn for output
         setIteration(iteration);
 
         priority = DirectionalQueues.getPriority(this);
@@ -42,7 +53,7 @@ public class Car {
                     break;
                 }
             case 2: // attempting to cross
-                CrossIntersection(quadrants, intersectionQueue); // TODO:  implement retry queue
+                CrossIntersection(intersectionQueue);
                 break;
             case 3: // crossing
                 waitTimer--;
@@ -51,13 +62,14 @@ public class Car {
                 }
             case 4: // exiting
                 status = 4;
-                ExitIntersection(quadrants);
+                ExitIntersection();
                 break;
             default:
                 break;
         }
     }
 
+    // performs action based on car arriving at an intersection
     public void ArriveIntersection(List<Car> intersectionQueue) {
         waitTimer = 2;
         status = 1;
@@ -68,22 +80,25 @@ public class Car {
         intersectionQueue.add(this);
     }
 
-    public void CrossIntersection(List<Semaphore> quadrants, List<Car> intersectionQueue) { // acquire semaphores on turns
+    // Attempts to either turn left, right, or drive through by trying to access the semaphores.
+    // if not all semaphores are available that the car needs to perform its required action it will
+    // release any that it did obtain.
+    public void CrossIntersection(List<Car> intersectionQueue) { // acquire semaphores on turns
         int pre = Arrays.asList(directions).indexOf(dir_original);
         int post = Arrays.asList(directions).indexOf(dir_target);
 
         if (pre == 3 && post == 0) {
-            TurnRight(pre, quadrants, intersectionQueue);
+            TurnRight(pre, intersectionQueue);
         } else if (pre == 0 && post == 3) {
-            TurnLeft(pre, quadrants, intersectionQueue);
+            TurnLeft(pre, intersectionQueue);
         } else {
             int action = post - pre;
             if (action == 1)
-                TurnRight(pre, quadrants, intersectionQueue);
+                TurnRight(pre, intersectionQueue);
             else if (action == 0)
-                DriveThrough(pre, quadrants, intersectionQueue);
+                DriveThrough(pre, intersectionQueue);
             else if (action == -1)
-                TurnLeft(pre, quadrants, intersectionQueue);
+                TurnLeft(pre, intersectionQueue);
         }
 
         if (waitTimer > 0) {
@@ -101,12 +116,12 @@ public class Car {
         }
     }
 
-    public void ExitIntersection(List<Semaphore> quadrants) {
+    public void ExitIntersection() {
 
-        for(int i = 0; i < semaphores.length; i++){
-            if(semaphores[i] != -1) {
-                quadrants.get(semaphores[i]).release(this);
-                semaphores[i] = -1;
+        for(int i = 0; i < semaphoresUsed.length; i++){
+            if(semaphoresUsed[i] != -1) {
+                Semaphore.semaphores.get(semaphoresUsed[i]).release(this);
+                semaphoresUsed[i] = -1;
             }
         }
 
@@ -115,124 +130,124 @@ public class Car {
         status = 5;
     }
 
-public void DriveThrough(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
+public void DriveThrough(int pre, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
           waitTimer = 4;
 
         switch (pre) {
             case 0:
-                semaphores[0] = 3;
-                semaphores[1] = 0;
+                semaphoresUsed[0] = 3;
+                semaphoresUsed[1] = 0;
                 break;
             case 1:
-                semaphores[0] = 2;
-                semaphores[1] = 3;
+                semaphoresUsed[0] = 2;
+                semaphoresUsed[1] = 3;
                 break;
             case 2:
-                semaphores[0] = 1;
-                semaphores[1] = 2;
+                semaphoresUsed[0] = 1;
+                semaphoresUsed[1] = 2;
                 break;
             case 3:
-                semaphores[0] = 0;
-                semaphores[1] = 1;
+                semaphoresUsed[0] = 0;
+                semaphoresUsed[1] = 1;
                 break;
             default:
                 break;
         }
 
-        quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
-        quadrants.get(semaphores[1]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue) && quadrants.get(semaphores[1]).isAvailable(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[0]).acquire(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[1]).acquire(this, intersectionQueue);
+        isSemaphoreOpen = Semaphore.semaphores.get(semaphoresUsed[0]).isAvailable(this, intersectionQueue) && Semaphore.semaphores.get(semaphoresUsed[1]).isAvailable(this, intersectionQueue);
 
         if (!isSemaphoreOpen)  {
             waitTimer = 0;
-            if(isSemaphoreOwned(semaphores[0], quadrants)) {
-                quadrants.get(semaphores[0]).release(this);
-                semaphores[0] = -1;
-            }if(isSemaphoreOwned(semaphores[1], quadrants)) {
-                quadrants.get(semaphores[1]).release(this);
-                semaphores[1] = -1;
+            if(isSemaphoreOwned(semaphoresUsed[0])) {
+                Semaphore.semaphores.get(semaphoresUsed[0]).release(this);
+                semaphoresUsed[0] = -1;
+            }if(isSemaphoreOwned(semaphoresUsed[1])) {
+                Semaphore.semaphores.get(semaphoresUsed[1]).release(this);
+                semaphoresUsed[1] = -1;
             }
         }
     }
 
-    public void TurnLeft(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
+    public void TurnLeft(int pre, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
         waitTimer = 5;
 
         switch (pre) {
             case 0:
-                semaphores[0] = 3;
-                semaphores[1] = 0;
-                semaphores[2] = 1;
+                semaphoresUsed[0] = 3;
+                semaphoresUsed[1] = 0;
+                semaphoresUsed[2] = 1;
                 break;
             case 1:
-                semaphores[0] = 2;
-                semaphores[1] = 3;
-                semaphores[2] = 0;
+                semaphoresUsed[0] = 2;
+                semaphoresUsed[1] = 3;
+                semaphoresUsed[2] = 0;
                 break;
             case 2:
-                semaphores[0] = 1;
-                semaphores[1] = 2;
-                semaphores[2] = 3;
+                semaphoresUsed[0] = 1;
+                semaphoresUsed[1] = 2;
+                semaphoresUsed[2] = 3;
                 break;
             case 3:
-                semaphores[0] = 0;
-                semaphores[1] = 1;
-                semaphores[2] = 2;
+                semaphoresUsed[0] = 0;
+                semaphoresUsed[1] = 1;
+                semaphoresUsed[2] = 2;
                 break;
             default:
                 break;
         }
 
-        quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
-        quadrants.get(semaphores[1]).acquire(this, intersectionQueue);
-        quadrants.get(semaphores[2]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue)
-                && quadrants.get(semaphores[1]).isAvailable(this, intersectionQueue)
-                && quadrants.get(semaphores[2]).isAvailable(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[0]).acquire(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[1]).acquire(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[2]).acquire(this, intersectionQueue);
+        isSemaphoreOpen = Semaphore.semaphores.get(semaphoresUsed[0]).isAvailable(this, intersectionQueue)
+                && Semaphore.semaphores.get(semaphoresUsed[1]).isAvailable(this, intersectionQueue)
+                && Semaphore.semaphores.get(semaphoresUsed[2]).isAvailable(this, intersectionQueue);
 
         if (!isSemaphoreOpen) {
             waitTimer = 0;
-            if(isSemaphoreOwned(semaphores[0], quadrants)) {
-                quadrants.get(semaphores[0]).release(this);
-                semaphores[0] = -1;
-            }if(isSemaphoreOwned(semaphores[1], quadrants)) {
-                quadrants.get(semaphores[1]).release(this);
-                semaphores[1] = -1;
-            }if(isSemaphoreOwned(semaphores[2], quadrants)) {
-                quadrants.get(semaphores[2]).release(this);
-                semaphores[2] = -1;
+            if(isSemaphoreOwned(semaphoresUsed[0])) {
+                Semaphore.semaphores.get(semaphoresUsed[0]).release(this);
+                semaphoresUsed[0] = -1;
+            }if(isSemaphoreOwned(semaphoresUsed[1])) {
+                Semaphore.semaphores.get(semaphoresUsed[1]).release(this);
+                semaphoresUsed[1] = -1;
+            }if(isSemaphoreOwned(semaphoresUsed[2])) {
+                Semaphore.semaphores.get(semaphoresUsed[2]).release(this);
+                semaphoresUsed[2] = -1;
             }
         }
     }
 
-    public void TurnRight(int pre, List<Semaphore> quadrants, List<Car> intersectionQueue) {
+    public void TurnRight(int pre, List<Car> intersectionQueue) {
 
         boolean isSemaphoreOpen;
         waitTimer = 3;
 
         switch (pre) {
             case 0:
-                semaphores[0] = 3;
+                semaphoresUsed[0] = 3;
                 break;
             case 1:
-                semaphores[0] = 2;
+                semaphoresUsed[0] = 2;
                 break;
             case 2:
-                semaphores[0] = 1;
+                semaphoresUsed[0] = 1;
                 break;
             case 3:
-                semaphores[0] = 0;
+                semaphoresUsed[0] = 0;
                 break;
             default:
                 break;
         }
 
-        quadrants.get(semaphores[0]).acquire(this, intersectionQueue);
-        isSemaphoreOpen = quadrants.get(semaphores[0]).isAvailable(this, intersectionQueue);
+        Semaphore.semaphores.get(semaphoresUsed[0]).acquire(this, intersectionQueue);
+        isSemaphoreOpen = Semaphore.semaphores.get(semaphoresUsed[0]).isAvailable(this, intersectionQueue);
 
         if(!isSemaphoreOpen)
             waitTimer = 0;
@@ -272,8 +287,8 @@ public void DriveThrough(int pre, List<Semaphore> quadrants, List<Car> intersect
         this.iteration = i;
     }
 
-    private boolean isSemaphoreOwned(int index, List<Semaphore> quadrants){
-        return quadrants.get(index).getActiveThread() != null && this.getCid() == quadrants.get(index).getActiveThread().getCid();
+    private boolean isSemaphoreOwned(int index){
+        return Semaphore.semaphores.get(index).getActiveThread() != null && this.getCid() == Semaphore.semaphores.get(index).getActiveThread().getCid();
     }
 
     public int getPriority(){
