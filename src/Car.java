@@ -61,8 +61,11 @@ public class Car {
     public void ArriveIntersection(Queue<Car> intersectionQueue) {
         waitTimer = 2;
         status = 1;
+
+        DirectionalQueues.add(this);
+
         System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
-        intersectionQueue.add(this);
+//        intersectionQueue.add(this);
     }
 
     public void CrossIntersection(List<Semaphore> quadrants, Queue<Car> intersectionQueue) { // acquire semaphores on turns
