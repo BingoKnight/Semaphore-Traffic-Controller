@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 public class Main {
 
+    public static int subIndex = 1;
+
     public static void main(String args[]){
 
         List<Car> carList = Arrays.asList(new Car(1, 1, '^', '^'),

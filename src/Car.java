@@ -22,8 +22,10 @@ public class Car {
     private int status;
     private Character[] directions = {'^', '>', 'V', '<'};
     private int iteration;
+    private int subIndex = 0;
     private int[] semaphoresUsed = {-1, -1, -1};
     private int priority = 0;
+    private boolean hasWaited = false;
 
     public Car(int cid, int arrival_time, char dir_original, char dir_target) {
         this.cid = cid;
@@ -73,10 +75,11 @@ public class Car {
     public void ArriveIntersection(List<Car> intersectionQueue) {
         waitTimer = 2;
         status = 1;
+        subIndex = arrival_time;
 
         DirectionalQueues.add(this);
 
-        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
+        System.out.println("Time  " + iteration + "." + subIndex + ": Car " + cid + "(" + dir_original + " " + dir_target + ") arriving");
         intersectionQueue.add(this);
     }
 
@@ -103,7 +106,9 @@ public class Car {
 
         if (waitTimer > 0) {
             status = 3;
-            System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
+            if(hasWaited)
+                this.subIndex = Main.subIndex;
+            System.out.println("Time  " + iteration + "." + subIndex + ": Car " + cid + "(" + dir_original + " " + dir_target + ")          crossing");
             for(Car car : intersectionQueue){
                 if (this.isEqual(car)) {
                     intersectionQueue.remove(car);
@@ -113,10 +118,14 @@ public class Car {
             }
         } else if(!retryQueue.contains(this)) {
             retryQueue.add(this);
+            hasWaited = true;
+            this.subIndex = Main.subIndex;
         }
     }
 
     public void ExitIntersection() {
+
+        Main.subIndex = subIndex;
 
         for(int i = 0; i < semaphoresUsed.length; i++){
             if(semaphoresUsed[i] != -1) {
@@ -125,10 +134,10 @@ public class Car {
             }
         }
 
-        System.out.println("Time  " + iteration + "." + cid + ": Car " + cid + "(" + dir_original + " " + dir_target + ")                   exiting");
+        System.out.println("Time  " + iteration + "." + subIndex + ": Car " + cid + "(" + dir_original + " " + dir_target + ")                   exiting");
 
         status = 5;
-    }
+}
 
 public void DriveThrough(int pre, List<Car> intersectionQueue) {
 
